@@ -1,0 +1,7 @@
+logging:
+  level:
+    cn.yusiwen.spring: DEBUG
+
+commons:
+  security:
+    jwt-secret: test-secret-for-unit-tests-32-chars!
