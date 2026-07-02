@@ -1,7 +1,10 @@
 package cn.yusiwen.spring.commons.security.core.config;
 
+import cn.yusiwen.spring.commons.security.core.aspect.DataScopeAspect;
+import cn.yusiwen.spring.commons.security.core.aspect.PermissionAspect;
 import cn.yusiwen.spring.commons.security.core.filter.JwtAuthenticationTokenFilter;
 import cn.yusiwen.spring.commons.security.core.filter.XssFilter;
+import cn.yusiwen.spring.commons.security.core.filter.repeat.RepeatableFilter;
 import cn.yusiwen.spring.commons.security.core.handler.JwtAuthenticationEntryPoint;
 import cn.yusiwen.spring.commons.security.core.jwt.JwtTokenUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -28,8 +31,9 @@ public class SecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter(JwtTokenUtil jwtTokenUtil) {
-        return new JwtAuthenticationTokenFilter(jwtTokenUtil);
+    public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter(
+            JwtTokenUtil jwtTokenUtil, SecurityProperties properties) {
+        return new JwtAuthenticationTokenFilter(jwtTokenUtil, properties);
     }
 
     @Bean
@@ -58,5 +62,23 @@ public class SecurityAutoConfiguration {
     @ConditionalOnProperty(prefix = "commons.security", name = "xss.enabled", matchIfMissing = true)
     public XssFilter xssFilter() {
         return new XssFilter();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "commons.security", name = "repeatable-filter-enabled", matchIfMissing = false)
+    public RepeatableFilter repeatableFilter() {
+        return new RepeatableFilter();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "commons.security", name = "permission-enabled", matchIfMissing = false)
+    public PermissionAspect permissionAspect() {
+        return new PermissionAspect();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DataScopeAspect dataScopeAspect() {
+        return new DataScopeAspect();
     }
 }

@@ -1,5 +1,6 @@
 package cn.yusiwen.spring.commons.security.core.filter;
 
+import cn.yusiwen.spring.commons.security.core.config.SecurityProperties;
 import cn.yusiwen.spring.commons.security.core.jwt.JwtPayLoad;
 import cn.yusiwen.spring.commons.security.core.jwt.JwtTokenUtil;
 import org.slf4j.Logger;
@@ -20,22 +21,23 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationTokenFilter.class);
 
-    private static final String TOKEN_HEADER = "Authorization";
-    private static final String TOKEN_PREFIX = "Bearer ";
-
     private final JwtTokenUtil jwtTokenUtil;
+    private final String tokenHeader;
+    private final String tokenPrefix;
 
-    public JwtAuthenticationTokenFilter(JwtTokenUtil jwtTokenUtil) {
+    public JwtAuthenticationTokenFilter(JwtTokenUtil jwtTokenUtil, SecurityProperties properties) {
         this.jwtTokenUtil = jwtTokenUtil;
+        this.tokenHeader = properties.getTokenHeader();
+        this.tokenPrefix = properties.getTokenPrefix();
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
-        String authHeader = request.getHeader(TOKEN_HEADER);
-        if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
-            String token = authHeader.substring(TOKEN_PREFIX.length());
+        String authHeader = request.getHeader(tokenHeader);
+        if (authHeader != null && authHeader.startsWith(tokenPrefix)) {
+            String token = authHeader.substring(tokenPrefix.length());
             try {
                 JwtPayLoad payLoad = jwtTokenUtil.parseToken(token);
                 UsernamePasswordAuthenticationToken authentication =
